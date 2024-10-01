@@ -4,7 +4,6 @@ class LinearRegression {
   constructor(features, labels, options) {
     this.features = this.processFeatures(features);
     this.labels = tf.tensor(labels);
-    const { mean, variance } = tf.moments(features, 0);
 
     this.options = Object.assign(
       {
@@ -46,13 +45,29 @@ class LinearRegression {
 
     const r2 = 1 - ssr / sst;
 
-    console.log(r2);
+    console.log(r2, testFeatures, sst);
   }
 
   processFeatures(features) {
     features = tf.tensor(features);
     features = tf.ones([features.shape[0], 1]).concat(features, 1);
+
+    if (this.mean && this.variance) {
+      features = features.sub(this.mean).div(this.variance.pow(0.5));
+    } else {
+      features = this.standardize(features);
+    }
+
     return features;
+  }
+
+  standardize(features) {
+    const { mean, variance } = tf.moments(features, 0);
+
+    this.mean = mean;
+    this.variance = variance;
+
+    return features.sub(mean).div(variance.pow(0.5));
   }
 }
 
