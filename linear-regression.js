@@ -34,6 +34,7 @@ class LinearRegression {
     for (let i = 0; i < this.options.iterations; i++) {
       this.gradientDescent();
       this.recordMSE();
+      this.updateLearningRate();
     }
   }
 
@@ -72,9 +73,28 @@ class LinearRegression {
     return features.sub(mean).div(variance.pow(0.5));
   }
 
-  recordMSE(){
-    const mse = this.features.matMul(this.weights).sub(this.labels).pow(2).sum().div(this.features.shape[0]).arraySync()
-    this.mseHistory.push(mse)
+  recordMSE() {
+    const mse = this.features
+      .matMul(this.weights)
+      .sub(this.labels)
+      .pow(2)
+      .sum()
+      .div(this.features.shape[0])
+      .arraySync();
+    this.mseHistory.unshift(mse);
+  }
+
+  updateLearningRate() {
+    if (this.mseHistory.length < 2) return;
+
+    const lastValue = this.mseHistory[0];
+    const secondLast = this.mseHistory[1];
+
+    if (lastValue > secondLast) {
+      this.options.learningRate /= 2;
+    } else {
+      this.options.learningRate *= 1.05;
+    }
   }
 }
 
