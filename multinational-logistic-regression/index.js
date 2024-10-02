@@ -29,8 +29,7 @@ const { features, labels, testFeatures, testLabels } = loadCSV(
 const regression = new LogisticRegression(features, _.flatMap(labels), {
   learningRate: 0.5,
   iterations: 100,
-  batchSize: 50,
-  decisionBoundary: 0.6,
+  batchSize: 10,
 });
 
 regression.train();
