@@ -9,7 +9,7 @@ class LinearRegression {
     this.options = Object.assign(
       {
         learningRate: 0.1,
-        iterations: 1000,
+        iterations: 100,
       },
       options
     );
@@ -51,6 +51,10 @@ class LinearRegression {
     }
   }
 
+  predict(observations) {
+    return this.processFeatures(observations).matMul(this.weights);
+  }
+
   test(testFeatures, testLabels) {
     testFeatures = this.processFeatures(testFeatures);
     testLabels = tf.tensor(testLabels);
@@ -61,7 +65,7 @@ class LinearRegression {
 
     const r2 = 1 - ssr / sst;
 
-    console.log(r2);
+    return r2;
   }
 
   processFeatures(features) {
