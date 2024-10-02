@@ -45,7 +45,7 @@ class LinearRegression {
 
     const r2 = 1 - ssr / sst;
 
-    console.log(r2, testFeatures, sst);
+    console.log(r2, testFeatures, sst, ssr);
   }
 
   processFeatures(features) {
