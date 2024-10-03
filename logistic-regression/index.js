@@ -4,7 +4,7 @@ const LogisticRegression = require("./logistic-regression");
 const mnist = require("mnist-data");
 const _ = require("lodash");
 
-const mnistData = mnist.training(0, 10);
+const mnistData = mnist.training(0, 5000);
 
 const features = mnistData.images.values.map((image) => _.flatMap(image));
 
@@ -14,4 +14,20 @@ const encodedLabels = mnistData.labels.values.map((v) => {
   return arr;
 });
 
-console.log(encodedLabels);
+const regression = new LogisticRegression(features, encodedLabels, {
+  learningRate: 1,
+  iterations: 20,
+  batchSize: 100,
+});
+
+regression.train();
+
+const testMnistData = mnist.testing(0, 100);
+const testFeatures = testMnistData.images.values.map((v) => _.flatMap(v));
+const testLabels = testMnistData.labels.values.map((v) => {
+  const arr = Array(10).fill(0);
+  arr[v] = 1;
+  return arr;
+});
+
+console.log(regression.test(testFeatures, testLabels));
