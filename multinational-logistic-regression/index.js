@@ -1,38 +1,33 @@
 require("@tensorflow/tfjs-node");
-const _ = require("lodash");
 const tf = require("@tensorflow/tfjs");
-const loadCSV = require("../load-csv");
 const LogisticRegression = require("./logistic-regression");
+const mnist = require("mnist-data");
+const _ = require("lodash");
 
-const { features, labels, testFeatures, testLabels } = loadCSV(
-  "../data/cars.csv",
-  {
-    dataColumns: ["horsepower", "displacement", "weight"],
-    labelColumns: ["mpg"],
-    shuffle: true,
-    splitTest: 50,
-    converters: {
-      mpg: (v) => {
-        const mpg = parseFloat(v);
-        if (mpg < 15) {
-          return [1, 0, 0];
-        } else if (mpg < 30) {
-          return [0, 1, 0];
-        } else {
-          return [0, 0, 1];
-        }
-      },
-    },
-  }
-);
+const mnistData = mnist.training(0, 60000);
 
-const regression = new LogisticRegression(features, _.flatMap(labels), {
-  learningRate: 0.5,
-  iterations: 100,
-  batchSize: 10,
+const features = mnistData.images.values.map((image) => _.flatMap(image));
+
+const encodedLabels = mnistData.labels.values.map((v) => {
+  const arr = Array(10).fill(0);
+  arr[v] = 1;
+  return arr;
+});
+
+const regression = new LogisticRegression(features, encodedLabels, {
+  learningRate: 1,
+  iterations: 20,
+  batchSize: 100,
 });
 
 regression.train();
 
-// regression.predict([[215, 440, 2.15]]).print();
-console.log(regression.test(testFeatures, _.flatMap(testLabels)));
+const testMnistData = mnist.testing(0, 1000);
+const testFeatures = testMnistData.images.values.map((v) => _.flatMap(v));
+const testLabels = testMnistData.labels.values.map((v) => {
+  const arr = Array(10).fill(0);
+  arr[v] = 1;
+  return arr;
+});
+
+console.log(regression.test(testFeatures, testLabels));
